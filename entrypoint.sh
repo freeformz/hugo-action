@@ -4,7 +4,7 @@ set -e
 echo "#################################################"
 echo "Starting the Hugo Action"
 
-sh -c "hugo $*"
+sh -c "GIT_COMMIT_SHA=`git rev-parse --verify HEAD` GIT_COMMIT_SHA_SHORT=`git rev-parse --short HEAD` hugo $*"
 
 echo "#################################################"
 echo "Completed the Hugo Action"
