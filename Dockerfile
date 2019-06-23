@@ -5,8 +5,8 @@ LABEL "com.github.actions.description"="Commands to help with building Hugo base
 LABEL "com.github.actions.icon"="mic"
 LABEL "com.github.actions.color"="yellow"
 
-LABEL "repository"="http://github.com/srt32/hugo-actions"
-LABEL "homepage"="http://github.com/srt32/hugo-actions"
+LABEL "repository"="http://github.com/freeformz/hugo-actions"
+LABEL "homepage"="http://github.com/freeformz/hugo-actions"
 
 RUN apk add --no-cache hugo bash git
 
