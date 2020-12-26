@@ -2,51 +2,40 @@
 
 An Action to run [`hugo`](https://gohugo.io/) commands.
 
-This example runs on pushes to the master branch and will run `hugo --theme=hyde-x` to build your site.
+This example runs on pushes to the master branch and will run `hugo ` to build your site.
 
-```
-workflow "Hugo build" {
-  resolves = [
-    "Hugo Action",
-  ]
-  on = "push"
-}
+Check out entrypoint.sh to see exactly what it does.
 
-action "Hugo Action" {
-  uses = "srt32/hugo-action@master"
-  needs = "Filters for GitHub Actions"
-  args = "--theme=hyde-x"
-}
+## Usage
 
-action "Filters for GitHub Actions" {
-  uses = "actions/bin/filter@b2bea0749eed6beb495a8fa194c071847af60ea1"
-  args = "branch master"
-}
-```
-
-Want to dynamically fetch themes before building? Use [this action](https://github.com/marketplace/actions/git-actions) like this
-
-```
-workflow "Hugo build" {
-  resolves = [
-    "Hugo Action",
-  ]
-  on = "push"
-}
-
-action "Fetch git submodules" {
-  uses = "srt32/git-actions@master"
-  args = "cd themes && git clone https://github.com/zyro/hyde-x"
-}
-
-action "Hugo Action" {
-  uses = "srt32/hugo-action@master"
-  needs = ["Filters for GitHub Actions", "Fetch git submodules"]
-  args = "--theme=hyde-x"
-}
-
-action "Filters for GitHub Actions" {
-  uses = "actions/bin/filter@b2bea0749eed6beb495a8fa194c071847af60ea1"
-  args = "branch master"
-}
+```yaml
+on:
+  push:
+    branches:
+      - master
+name: Deploy
+jobs:
+  build:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Hugo
+      uses: freeformz/hugo-action@master
+      with:
+        args: --enableGitInfo
+    - name: S3 sync
+      uses: docker://amazon/aws-cli:2.0.7
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      with:
+        args: s3 sync --delete ./public s3://icanhazdowntime.org
+    - name: Kick Cloudfront
+      uses: docker://amazon/aws-cli:2.0.7
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      with:
+        args: cloudfront create-invalidation --distribution-id ${{ secrets.CloudFrontDistributionID }} --paths /*
 ```
