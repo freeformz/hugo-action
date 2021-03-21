@@ -8,7 +8,7 @@ LABEL "com.github.actions.color"="yellow"
 LABEL "repository"="http://github.com/freeformz/hugo-actions"
 LABEL "homepage"="http://github.com/freeformz/hugo-actions"
 
-RUN apk add --no-cache hugo bash git
+RUN apk add --no-cache hugo bash git make musl-dev go
 
 ADD entrypoint.sh /
 RUN chmod +x /entrypoint.sh
